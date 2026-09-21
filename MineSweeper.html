@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>MineSweeper</title>
+        <link rel="stylesheet" href="MineSweeper.css">
+        <script src="MineSweeper.js" defer></script>
+    </head>
+    <body>
+        <header><h1>Mine Sweeper</h1></header>
+        
+        <aside>
+            <!--Tamaño segun dificultad modificable-->
+            <button data-tamanio="9"  data-minas="10">Easy</button>
+            <button data-tamanio="16" data-minas="40">Medium</button>
+            <button data-tamanio="30" data-minas="99">Hard</button>
+        </aside>
+
+        <div id="contadorMinas"></div>
+        <div id="cronometro"></div>
+
+        <div id="tablero" class="juego"></div>
+
+        <div id="mensaje"></div>
+    </body>
+</html>
