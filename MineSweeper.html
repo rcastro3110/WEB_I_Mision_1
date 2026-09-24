@@ -9,7 +9,7 @@
     </head>
     <body>
         <header><h1>Mine Sweeper</h1></header>
-        
+    
         <aside>
             <!--Tamaño segun dificultad modificable-->
             <button data-tamanio="9"  data-minas="10">Easy</button>
@@ -17,11 +17,16 @@
             <button data-tamanio="30" data-minas="99">Hard</button>
         </aside>
 
-        <div id="contadorMinas"></div>
-        <div id="cronometro"></div>
+        <main>
+            <div class="barra">
+                <div id="contadorMinas">🚩 10</div>
+                <button id="reiniciar">🙂</button>
+                <div id="cronometro">000</div>
+            </div>
 
-        <div id="tablero" class="juego"></div>
+            <div id="tablero" class="juego"></div>
 
-        <div id="mensaje"></div>
+            <div id="mensaje"></div>
+        </main>
     </body>
 </html>
