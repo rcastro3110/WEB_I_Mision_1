@@ -66,6 +66,26 @@ function calcularAdyacentes(){
   }
 }
 
+function pintarTablero() {
+    //Limpia el div de tablero
+    while (tablero.firstChild){
+        tablero.removeChild(tablero.firstChild);
+    }
+
+    tablero.style.setProperty("--cols", COLUMNAS);
+
+    for (let f = 0; f < FILAS; f++) {
+        for (let c = 0; c < COLUMNAS; c++) {
+            const div = document.createElement("div");
+            div.classList.add("celda");
+            div.dataset.fila = f;
+            div.dataset.columna = c;
+
+            tablero.appendChild(div);
+        }
+    }
+}
+
 function imprimirTablero() {
   for (let f = 0; f < FILAS; f++) {
     let filaTexto = "";

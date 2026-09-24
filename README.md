@@ -1,3 +1,9 @@
-# WEB_I_Mision_1
+# Buscaminas/MineSweeper
 
-Voy a hacer un buscaminas
+Misión M1 · El Despertar del DOM — Web Development I.
+
+## Cómo probarlo
+
+## Uso de IA
+
+## Autopsia
