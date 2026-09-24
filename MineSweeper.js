@@ -9,6 +9,7 @@ let COLUMNAS = 9;
 let N_MINAS = 10;
 
 let tableroDatos = [];
+let estadoJuego = "jugando"; // 'jugando' | 'ganado' | 'perdido'
 
 //Crear tablero
 for(let i = 0; i < FILAS; i++){
@@ -86,6 +87,70 @@ function pintarTablero() {
     }
 }
 
+function revelarCelda(fila, columna){
+    if(estadoJuego !== "jugando") return;
+
+    const celda = tableroDatos[fila][columna];
+
+    if(celda.isRevealed || celda.isFlagged) return;
+
+    celda.isRevealed = true;
+
+    const div = document.querySelector(`[data-fila="${fila}"][data-columna="${columna}"]`);
+    div.classList.add("revelada");
+
+    if(celda.hasMine){
+        div.textContent = "💣";
+        perderJuego(); 
+        return;
+    }
+
+    if(celda.adjacentMines > 0){
+        div.textContent = celda.adjacentMines;
+    } else {
+        // Flood fill: revelamos automáticamente las 8 vecinas
+        for (let df = -1; df <= 1; df++) {
+            for (let dc = -1; dc <= 1; dc++) {
+                if (df === 0 && dc === 0) continue;
+
+                const filaVecina = fila + df;
+                const colVecina = columna + dc;
+
+                if (filaVecina >= 0 && filaVecina < FILAS && colVecina >= 0 && colVecina < COLUMNAS) {
+                    revelarCelda(filaVecina, colVecina); // llamada recursiva
+                }
+            }
+        }
+    }
+}
+
+function perderJuego(){
+    estadoJuego = "perdido";
+    mensaje.textContent = "💥💥💥💥 Perdiste 💥💥💥💥";
+
+    // Revelamos todas las minas del tablero, aunque el jugador no las haya clicado
+    for (let f = 0; f < FILAS; f++) {
+        for (let c = 0; c < COLUMNAS; c++) {
+            const celda = tableroDatos[f][c];
+            if (celda.hasMine) {
+                const div = document.querySelector(`[data-fila="${f}"][data-columna="${c}"]`);
+                div.classList.add("revelada");
+                div.textContent = "💣";
+            }
+        }
+    }
+}
+
+tablero.addEventListener("click", function(event){
+    if(!event.target.classList.contains("celda")) return;
+    
+    const fila = Number(event.target.dataset.fila);
+    const columna = Number(event.target.dataset.columna);
+
+    revelarCelda(fila, columna);
+});
+
+//Funcion para imprimir por consola el tablero
 function imprimirTablero() {
   for (let f = 0; f < FILAS; f++) {
     let filaTexto = "";

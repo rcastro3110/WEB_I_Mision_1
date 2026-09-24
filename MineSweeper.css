@@ -129,6 +129,12 @@ main {
   border-color: var(--accent);
 }
 
+.celda.revelada {
+  cursor: default;
+  pointer-events: none;
+  background-color: var(--border);
+}
+
 #mensaje {
   font-size: 1.1rem;
   color: var(--accent);
