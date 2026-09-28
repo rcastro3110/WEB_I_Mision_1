@@ -2,28 +2,42 @@ const tablero = document.getElementById("tablero");
 const contadorMinas = document.getElementById("contadorMinas");
 const cronometro = document.getElementById("cronometro");
 const botonReiniciar = document.getElementById("reiniciar");
+const botonDificultad = document.getElementById("dificultad");
 const mensaje = document.getElementById("mensaje");
 
 let FILAS = 9;
 let COLUMNAS = 9;
 let N_MINAS = 10;
 let BANDERAS_PUESTAS = 0;
+let CELDAS_REVELADAS = 0;
 
 let tableroDatos = [];
 let estadoJuego = "jugando"; // 'jugando' | 'ganado' | 'perdido'
+let segundos = 0;
+let intervaloId = null;
+let tiempoIniciado = false;
 
-//Crear tablero
-for(let i = 0; i < FILAS; i++){
-    let fila = [];
-    for(let j = 0; j < COLUMNAS; j++){
-        fila.push({
-            hasMine: false,
-            adjacentMines:0,
-            isRevealed: false,
-            isFlagged: false
-        });
+function iniciarJuego(){
+    tableroDatos = [];
+
+    //Crear tablero
+    for(let i = 0; i < FILAS; i++){
+        let fila = [];
+        for(let j = 0; j < COLUMNAS; j++){
+            fila.push({
+                hasMine: false,
+                adjacentMines:0,
+                isRevealed: false,
+                isFlagged: false
+            });
+        }
+        tableroDatos.push(fila);
     }
-    tableroDatos.push(fila);
+
+    resetCronometro();
+    colocarMinas();
+    calcularAdyacentes();
+    pintarTablero();
 }
 
 function colocarMinas(){
@@ -32,7 +46,7 @@ function colocarMinas(){
         let filaRand = Math.floor(Math.random() * FILAS);
         let columnaRand = Math.floor(Math.random() * COLUMNAS);
 
-        if(tableroDatos[filaRand][columnaRand].hasMine == false){
+        if(!tableroDatos[filaRand][columnaRand].hasMine){
             tableroDatos[filaRand][columnaRand].hasMine = true;
             i--;
         }        
@@ -95,6 +109,8 @@ function revelarCelda(fila, columna){
 
     if(celda.isRevealed || celda.isFlagged) return;
 
+    iniciarCronometro();
+
     celda.isRevealed = true;
 
     const div = document.querySelector(`[data-fila="${fila}"][data-columna="${columna}"]`);
@@ -105,6 +121,8 @@ function revelarCelda(fila, columna){
         perderJuego(); 
         return;
     }
+
+    CELDAS_REVELADAS++;
 
     if(celda.adjacentMines > 0){
         div.textContent = celda.adjacentMines;
@@ -123,11 +141,16 @@ function revelarCelda(fila, columna){
             }
         }
     }
+
+    if(CELDAS_REVELADAS === ((FILAS * COLUMNAS)-N_MINAS)){
+        ganarJuego();
+    }
 }
 
 function perderJuego(){
     estadoJuego = "perdido";
-    mensaje.textContent = "💥💥💥💥 Perdiste 💥💥💥💥";
+    mensaje.textContent = "💥💥💥💥 GAME OVER 💥💥💥💥";
+    pararCronometro();
 
     // Revelamos todas las minas del tablero, aunque el jugador no las haya clicado
     for(let f = 0; f < FILAS; f++){
@@ -164,6 +187,61 @@ function marcarCelda(fila, columna){
     contadorMinas.textContent = `🚩 ${N_MINAS - BANDERAS_PUESTAS}`;
 }
 
+function ganarJuego(){
+    estadoJuego = "ganado";
+    mensaje.textContent = "VICTORY";
+    contadorMinas.textContent = "🚩 0";
+    pararCronometro();
+
+    // Marcamos visualmente las minas que quedaban sin bandera
+    for(let f = 0; f < FILAS; f++){
+        for(let c = 0; c < COLUMNAS; c++){
+            const celda = tableroDatos[f][c];
+            if(celda.hasMine){
+                const div = document.querySelector(`[data-fila="${f}"][data-columna="${c}"]`);
+                div.classList.add("revelada");
+                div.textContent = "🚩";
+            }
+        }
+    }
+}
+
+function reiniciarJuego() {
+  // 1. Resetear variables de estado a sus valores iniciales
+  estadoJuego = "jugando";
+  BANDERAS_PUESTAS = 0;
+  CELDAS_REVELADAS = 0;
+
+  // 2. Limpiar textos en pantalla
+  mensaje.textContent = "";
+  contadorMinas.textContent = `🚩 ${N_MINAS}`;
+
+  // 3. Montar la partida de nuevo
+  iniciarJuego();
+}
+
+function iniciarCronometro(){
+    if(tiempoIniciado) return;
+
+    tiempoIniciado = true;
+
+    intervaloId = setInterval(function(){
+        segundos++;
+        cronometro.textContent = String(segundos).padStart(3, "0");
+    }, 1000);
+}
+
+function pararCronometro(){
+    clearInterval(intervaloId);
+}
+
+function resetCronometro(){
+    pararCronometro();
+    segundos = 0;
+    tiempoIniciado = false;
+    cronometro.textContent = "000";
+}
+
 tablero.addEventListener("click", function(event){
     if(!event.target.classList.contains("celda")) return;
     
@@ -184,21 +262,18 @@ tablero.addEventListener("contextmenu", function(event){
     marcarCelda(fila, columna);
 });
 
-//Funcion para imprimir por consola el tablero
-function imprimirTablero() {
-  for (let f = 0; f < FILAS; f++) {
-    let filaTexto = "";
+botonReiniciar.addEventListener("click", ()=>{
+    reiniciarJuego();
+});
 
-    for (let c = 0; c < COLUMNAS; c++) {
-      const celda = tableroDatos[f][c];
+botonDificultad.addEventListener("click", function(event){
+    if(!(event.target.tagName === "BUTTON")) return;
 
-      if (celda.hasMine) {
-        filaTexto += "* ";
-      } else {
-        filaTexto += celda.adjacentMines + " ";
-      }
-    }
+    FILAS = Number(event.target.dataset.tamanio);
+    COLUMNAS = Number(event.target.dataset.tamanio);
+    N_MINAS = Number(event.target.dataset.minas);
 
-    console.log(filaTexto);
-  }
-}
+    reiniciarJuego();
+});
+
+iniciarJuego();
