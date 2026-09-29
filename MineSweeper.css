@@ -5,6 +5,7 @@
   --accent: #39ff14;
   --text: #e0e0e0;
   --danger: #ff3b3b;
+  --revealed: #473d3d;
 }
 
 body {
@@ -13,7 +14,7 @@ body {
   color: var(--text);
   background-color: var(--bg);
   display: grid;
-  grid-template-columns: 150px 1fr;
+  grid-template-columns: 175px 1fr;
   grid-template-rows: auto 1fr;
   grid-template-areas:
     "header header"
@@ -132,13 +133,17 @@ main {
 .celda.revelada {
   cursor: default;
   pointer-events: none;
-  background-color: var(--border);
+  background-color: var(--revealed);
 }
 
 #mensaje {
   font-size: 1.1rem;
   color: var(--accent);
   min-height: 1.5em;
+}
+
+.oculto {
+  display: none;
 }
 
 @media (max-width: 700px) {

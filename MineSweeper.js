@@ -4,6 +4,12 @@ const cronometro = document.getElementById("cronometro");
 const botonReiniciar = document.getElementById("reiniciar");
 const botonDificultad = document.getElementById("dificultad");
 const mensaje = document.getElementById("mensaje");
+const botonPersonalizadoToggle = document.getElementById("botonPersonalizadoToggle");
+const personalizadoDiv = document.getElementById("personalizado");
+const inputFilas = document.getElementById("inputFilas");
+const inputColumnas = document.getElementById("inputColumnas");
+const inputMinas = document.getElementById("inputMinas");
+const botonPersonalizado = document.getElementById("botonPersonalizado");
 
 let FILAS = 9;
 let COLUMNAS = 9;
@@ -226,7 +232,7 @@ function iniciarCronometro(){
     tiempoIniciado = true;
 
     intervaloId = setInterval(function(){
-        segundos++;
+        if(segundos < 999) segundos++;
         cronometro.textContent = String(segundos).padStart(3, "0");
     }, 1000);
 }
@@ -268,10 +274,42 @@ botonReiniciar.addEventListener("click", ()=>{
 
 botonDificultad.addEventListener("click", function(event){
     if(!(event.target.tagName === "BUTTON")) return;
+    if(!event.target.dataset.tamanio) return; // nuevo: ignora botones sin data-tamanio
 
     FILAS = Number(event.target.dataset.tamanio);
     COLUMNAS = Number(event.target.dataset.tamanio);
     N_MINAS = Number(event.target.dataset.minas);
+
+    reiniciarJuego();
+});
+
+botonPersonalizadoToggle.addEventListener("click", function(){
+    personalizadoDiv.classList.toggle("oculto");
+});
+
+botonPersonalizado.addEventListener("click", function(){
+    const filas = Number(inputFilas.value);
+    const columnas = Number(inputColumnas.value);
+    const minas = Number(inputMinas.value);
+
+    if(!Number.isInteger(filas) || filas < 5 || filas > 30){
+        mensaje.textContent = "Filas inválidas (5-30)";
+        return;
+    }
+
+    if(!Number.isInteger(columnas) || columnas < 5 || columnas > 30){
+        mensaje.textContent = "Columnas inválidas (5-30)";
+        return;
+    }
+
+    if(!Number.isInteger(minas) || minas < 1 || minas >= filas * columnas){
+        mensaje.textContent = "Número de minas inválido";
+        return;
+    }
+
+    FILAS = filas;
+    COLUMNAS = columnas;
+    N_MINAS = minas;
 
     reiniciarJuego();
 });

@@ -15,6 +15,17 @@
             <button data-tamanio="9"  data-minas="10">Easy</button>
             <button data-tamanio="16" data-minas="40">Medium</button>
             <button data-tamanio="30" data-minas="99">Hard</button>
+            <button id="botonPersonalizadoToggle">Custom ▾</button>
+
+            <div id="personalizado" class="oculto">
+                <input type="number" id="inputFilas" min="5" max="30">
+                <label for="inputFilas">Rows</label>              
+                <input type="number" id="inputColumnas" min="5" max="30">
+                <label for="inputColumnas">Columns</label>
+                <input type="number" id="inputMinas" min="1" max="1000">
+                <label for="inputMinas">Mines</label>
+                <button id="botonPersonalizado">Play</button>
+            </div>
         </aside>
 
         <main>
