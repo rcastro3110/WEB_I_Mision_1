@@ -314,4 +314,10 @@ botonPersonalizado.addEventListener("click", function(){
     reiniciarJuego();
 });
 
+document.addEventListener("keydown", function(event){
+    if(event.key === "b"){
+        document.body.classList.toggle("claro");
+    }
+})
+
 iniciarJuego();

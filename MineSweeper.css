@@ -22,6 +22,16 @@ body {
   min-height: 100vh;
 }
 
+body.claro {
+  --bg: #c5c5c3;
+  --panel: #b69a9a;
+  --border: #030303;
+  --accent: #1a8f1a;
+  --text: #1a1a1a;
+  --danger: #ff3b3b;
+  --revealed: #e0ded8;
+}
+
 header {
   grid-area: header;
   padding: 4px 8px;
