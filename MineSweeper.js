@@ -11,11 +11,11 @@ const inputColumnas = document.getElementById("inputColumnas");
 const inputMinas = document.getElementById("inputMinas");
 const botonPersonalizado = document.getElementById("botonPersonalizado");
 
-let FILAS = 9;
-let COLUMNAS = 9;
-let N_MINAS = 10;
-let BANDERAS_PUESTAS = 0;
-let CELDAS_REVELADAS = 0;
+let filas = 9;
+let columnas = 9;
+let nMinas = 10;
+let celdasMarcadas = 0;
+let celdasReveladas = 0;
 
 let tableroDatos = [];
 let estadoJuego = "jugando"; // 'jugando' | 'ganado' | 'perdido'
@@ -27,14 +27,15 @@ function iniciarJuego(){
     tableroDatos = [];
 
     //Crear tablero
-    for(let i = 0; i < FILAS; i++){
+    for(let i = 0; i < filas; i++){
         let fila = [];
-        for(let j = 0; j < COLUMNAS; j++){
+        for(let j = 0; j < columnas; j++){
             fila.push({
                 hasMine: false,
                 adjacentMines:0,
                 isRevealed: false,
-                isFlagged: false
+                isFlagged: false,
+                elemento: null
             });
         }
         tableroDatos.push(fila);
@@ -47,10 +48,10 @@ function iniciarJuego(){
 }
 
 function colocarMinas(){
-    let i = N_MINAS;
+    let i = nMinas;
     while(i > 0){
-        let filaRand = Math.floor(Math.random() * FILAS);
-        let columnaRand = Math.floor(Math.random() * COLUMNAS);
+        let filaRand = Math.floor(Math.random() * filas);
+        let columnaRand = Math.floor(Math.random() * columnas);
 
         if(!tableroDatos[filaRand][columnaRand].hasMine){
             tableroDatos[filaRand][columnaRand].hasMine = true;
@@ -60,27 +61,19 @@ function colocarMinas(){
 }
 
 function calcularAdyacentes(){
-  for(let f = 0; f < FILAS; f++){
-    for(let c = 0; c < COLUMNAS; c++){
+  for(let f = 0; f < filas; f++){
+    for(let c = 0; c < columnas; c++){
         const celda = tableroDatos[f][c];
 
         if(celda.hasMine) continue; // si tiene mina, no calculamos nada, pasamos a la siguiente
 
         let contador = 0;
 
-        for(let df = -1; df <= 1; df++){
-            for(let dc = -1; dc <= 1; dc++){
-                if(df === 0 && dc === 0) continue;
-
-                let filaVecina = f + df;
-                let colVecina = c + dc;
-                
-                if(filaVecina >= 0 && filaVecina <= (FILAS - 1) && colVecina >= 0 && colVecina <= (COLUMNAS - 1)){
-                    const celdaVecina = tableroDatos[filaVecina][colVecina];
-                    if(celdaVecina.hasMine === true){
-                        contador++;
-                    }
-                }
+        const vecinos = vecinosDe(f,c);
+        for(const v of vecinos){
+            const celdaVecina = tableroDatos[v.fila][v.columna];
+            if(celdaVecina.hasMine){
+                contador++;
             }
         }
         celda.adjacentMines = contador;
@@ -94,16 +87,17 @@ function pintarTablero() {
         tablero.removeChild(tablero.firstChild);
     }
 
-    tablero.style.setProperty("--cols", COLUMNAS);
+    tablero.style.setProperty("--cols", columnas);
 
-    for (let f = 0; f < FILAS; f++) {
-        for (let c = 0; c < COLUMNAS; c++) {
+    for (let f = 0; f < filas; f++) {
+        for (let c = 0; c < columnas; c++) {
             const div = document.createElement("div");
             div.classList.add("celda");
             div.dataset.fila = f;
             div.dataset.columna = c;
 
             tablero.appendChild(div);
+            tableroDatos[f][c].elemento = div;
         }
     }
 }
@@ -119,7 +113,7 @@ function revelarCelda(fila, columna){
 
     celda.isRevealed = true;
 
-    const div = document.querySelector(`[data-fila="${fila}"][data-columna="${columna}"]`);
+    const div = celda.elemento;
     div.classList.add("revelada");
 
     if(celda.hasMine){
@@ -128,29 +122,41 @@ function revelarCelda(fila, columna){
         return;
     }
 
-    CELDAS_REVELADAS++;
+    celdasReveladas++;
 
     if(celda.adjacentMines > 0){
         div.textContent = celda.adjacentMines;
     } else {
         // Flood fill: revelamos automáticamente las 8 vecinas
-        for(let df = -1; df <= 1; df++){
-            for(let dc = -1; dc <= 1; dc++){
-                if(df === 0 && dc === 0) continue;
+        const vecinos = vecinosDe(fila, columna);
 
-                const filaVecina = fila + df;
-                const colVecina = columna + dc;
+        for(const v of vecinos){
+            revelarCelda(v.fila, v.columna);
+        }
+    }
+        
+    if(celdasReveladas === ((filas * columnas)-nMinas)){
+        ganarJuego();
+    }
+}
 
-                if(filaVecina >= 0 && filaVecina < FILAS && colVecina >= 0 && colVecina < COLUMNAS){
-                    revelarCelda(filaVecina, colVecina); // llamada recursiva
-                }
+function vecinosDe(fila, columna){
+    const vecinos = [];
+
+    for(let df = -1; df <= 1; df++){
+        for(let dc = -1; dc <= 1; dc++){
+            if(df === 0 && dc === 0) continue;
+
+            const filaVecina = fila + df;
+            const colVecina = columna + dc;
+
+            if(filaVecina >= 0 && filaVecina < filas && colVecina >= 0 && colVecina < columnas){
+                vecinos.push({ fila: filaVecina, columna: colVecina });
             }
         }
     }
 
-    if(CELDAS_REVELADAS === ((FILAS * COLUMNAS)-N_MINAS)){
-        ganarJuego();
-    }
+    return vecinos;
 }
 
 function perderJuego(){
@@ -159,11 +165,11 @@ function perderJuego(){
     pararCronometro();
 
     // Revelamos todas las minas del tablero, aunque el jugador no las haya clicado
-    for(let f = 0; f < FILAS; f++){
-        for(let c = 0; c < COLUMNAS; c++){
+    for(let f = 0; f < filas; f++){
+        for(let c = 0; c < columnas; c++){
             const celda = tableroDatos[f][c];
             if(celda.hasMine){
-                const div = document.querySelector(`[data-fila="${f}"][data-columna="${c}"]`);
+                const div = celda.elemento;
                 div.classList.add("revelada");
                 div.textContent = "💣";
             }
@@ -177,20 +183,20 @@ function marcarCelda(fila, columna){
     const celda = tableroDatos[fila][columna];
     if(celda.isRevealed) return;
 
-    const div = document.querySelector(`[data-fila="${fila}"][data-columna="${columna}"]`);
+    const div = celda.elemento;
 
     if(!celda.isFlagged){
-        if(BANDERAS_PUESTAS < N_MINAS){
+        if(celdasMarcadas < nMinas){
             celda.isFlagged = true;
             div.textContent = "🚩";
-            BANDERAS_PUESTAS++;
+            celdasMarcadas++;
         }
     } else {
         celda.isFlagged = false;
         div.textContent = "";
-        BANDERAS_PUESTAS--;
+        celdasMarcadas--;
     }
-    contadorMinas.textContent = `🚩 ${N_MINAS - BANDERAS_PUESTAS}`;
+    contadorMinas.textContent = `🚩 ${nMinas - celdasMarcadas}`;
 }
 
 function ganarJuego(){
@@ -200,11 +206,11 @@ function ganarJuego(){
     pararCronometro();
 
     // Marcamos visualmente las minas que quedaban sin bandera
-    for(let f = 0; f < FILAS; f++){
-        for(let c = 0; c < COLUMNAS; c++){
+    for(let f = 0; f < filas; f++){
+        for(let c = 0; c < columnas; c++){
             const celda = tableroDatos[f][c];
             if(celda.hasMine){
-                const div = document.querySelector(`[data-fila="${f}"][data-columna="${c}"]`);
+                const div = celda.elemento;
                 div.classList.add("revelada");
                 div.textContent = "🚩";
             }
@@ -215,12 +221,12 @@ function ganarJuego(){
 function reiniciarJuego() {
   // 1. Resetear variables de estado a sus valores iniciales
   estadoJuego = "jugando";
-  BANDERAS_PUESTAS = 0;
-  CELDAS_REVELADAS = 0;
+  celdasMarcadas = 0;
+  celdasReveladas = 0;
 
   // 2. Limpiar textos en pantalla
   mensaje.textContent = "";
-  contadorMinas.textContent = `🚩 ${N_MINAS}`;
+  contadorMinas.textContent = `🚩 ${nMinas}`;
 
   // 3. Montar la partida de nuevo
   iniciarJuego();
@@ -276,9 +282,9 @@ botonDificultad.addEventListener("click", function(event){
     if(!(event.target.tagName === "BUTTON")) return;
     if(!event.target.dataset.tamanio) return; // nuevo: ignora botones sin data-tamanio
 
-    FILAS = Number(event.target.dataset.tamanio);
-    COLUMNAS = Number(event.target.dataset.tamanio);
-    N_MINAS = Number(event.target.dataset.minas);
+    filas = Number(event.target.dataset.tamanio);
+    columnas = Number(event.target.dataset.tamanio);
+    nMinas = Number(event.target.dataset.minas);
 
     reiniciarJuego();
 });
@@ -288,28 +294,28 @@ botonPersonalizadoToggle.addEventListener("click", function(){
 });
 
 botonPersonalizado.addEventListener("click", function(){
-    const filas = Number(inputFilas.value);
-    const columnas = Number(inputColumnas.value);
-    const minas = Number(inputMinas.value);
+    const nuevasFilas = Number(inputFilas.value);
+    const nuevasColumnas = Number(inputColumnas.value);
+    const nuevasMinas = Number(inputMinas.value);
 
-    if(!Number.isInteger(filas) || filas < 5 || filas > 30){
+    if(!Number.isInteger(nuevasFilas) || nuevasFilas < 5 || nuevasFilas > 30){
         mensaje.textContent = "Filas inválidas (5-30)";
         return;
     }
 
-    if(!Number.isInteger(columnas) || columnas < 5 || columnas > 30){
+    if(!Number.isInteger(nuevasColumnas) || nuevasColumnas < 5 || nuevasColumnas > 30){
         mensaje.textContent = "Columnas inválidas (5-30)";
         return;
     }
 
-    if(!Number.isInteger(minas) || minas < 1 || minas >= filas * columnas){
+    if(!Number.isInteger(nuevasMinas) || nuevasMinas < 1 || nuevasMinas >= nuevasFilas * nuevasColumnas){
         mensaje.textContent = "Número de minas inválido";
         return;
     }
 
-    FILAS = filas;
-    COLUMNAS = columnas;
-    N_MINAS = minas;
+    filas = nuevasFilas;
+    columnas = nuevasColumnas;
+    nMinas = nuevasMinas;
 
     reiniciarJuego();
 });

@@ -3,7 +3,7 @@
 Misión M1 · El Despertar del DOM — Web Development I.
 
 ## Cómo probarlo
-Abre index.html en el navegador (o con Live Server). Elige dificultad
+Abre MineSweeper.html en el navegador (o con Live Server). Elige dificultad
 (Easy/Medium/Hard) o pulsa "Custom" para definir filas, columnas y
 minas a mano. El clic izquierdo revela una casilla y el clic derecho pone o
 quita una bandera. Tecla secreta: pulsa "b" para el modo claro.
