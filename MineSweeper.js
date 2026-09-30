@@ -165,16 +165,7 @@ function perderJuego(){
     pararCronometro();
 
     // Revelamos todas las minas del tablero, aunque el jugador no las haya clicado
-    for(let f = 0; f < filas; f++){
-        for(let c = 0; c < columnas; c++){
-            const celda = tableroDatos[f][c];
-            if(celda.hasMine){
-                const div = celda.elemento;
-                div.classList.add("revelada");
-                div.textContent = "💣";
-            }
-        }
-    }
+    revelarTodasLasMinas("💣");
 }
 
 function marcarCelda(fila, columna){
@@ -206,13 +197,18 @@ function ganarJuego(){
     pararCronometro();
 
     // Marcamos visualmente las minas que quedaban sin bandera
+    revelarTodasLasMinas("🚩");
+}
+
+//Refactorizada ya que es el mismo codigo para ganar como para perder
+function revelarTodasLasMinas(emoji){
     for(let f = 0; f < filas; f++){
         for(let c = 0; c < columnas; c++){
             const celda = tableroDatos[f][c];
             if(celda.hasMine){
                 const div = celda.elemento;
                 div.classList.add("revelada");
-                div.textContent = "🚩";
+                div.textContent = emoji;
             }
         }
     }

@@ -28,17 +28,20 @@ Escribí a mano: Las subfunciones de revelarCelda (ganarJuego(), perderJuego()).
    si ya tiene mina se descarta y se prueba otra) en vez de barajar una
    lista completa de posiciones (Fisher-Yates). Descarté la segunda
    porque añade un algoritmo nuevo que aprender sin ninguna ventaja real
-   de rendimiento a esta escala — la diferencia solo importaría con
+   de rendimiento a esta escala, la diferencia solo importaría con
    tableros mucho más grandes.
 
 3. Un solo listener de "click" y otro de "contextmenu" en el contenedor
    del tablero (delegación de eventos), leyendo "data-fila"/"data-columna"
    del "event.target", en vez de un listener por celda. Necesario además
    porque el tablero se destruye y se repinta entero al reiniciar o
-   cambiar de dificultad/tamaño — con un listener por celda habría que
+   cambiar de dificultad/tamaño, con un listener por celda habría que
    volver a engancharlos todos cada vez.
    
 4. El flood fill es recursivo: "revelarCelda" se llama a sí misma sobre
-   las vecinas de una celda con 0 minas alrededor. La recursión termina
-   sola porque cada llamada nueva topa con celdas ya reveladas o con
-   número > 0, que no vuelven a disparar más revelado.
+   las vecinas de una celda con 0 minas alrededor, y la recursión
+   termina sola porque cada llamada nueva topa con celdas ya reveladas
+   o con número > 0. Con el tamaño máximo del juego (30×30 = 900
+   celdas) el peor caso son unos cientos de llamadas anidadas, muy por
+   debajo del límite de pila típico de un navegador, asi que para este 
+   proyecto no hace falta pasar a una versión iterativa a este tamaño.
