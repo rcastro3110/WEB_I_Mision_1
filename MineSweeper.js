@@ -277,7 +277,7 @@ botonReiniciar.addEventListener("click", ()=>{
 botonDificultad.addEventListener("click", function(event){
     if(!(event.target.tagName === "BUTTON")) return;
     if(!event.target.dataset.tamanio) return; // nuevo: ignora botones sin data-tamanio
-
+    
     filas = Number(event.target.dataset.tamanio);
     columnas = Number(event.target.dataset.tamanio);
     nMinas = Number(event.target.dataset.minas);
@@ -318,7 +318,7 @@ botonPersonalizado.addEventListener("click", function(){
 
 document.addEventListener("keydown", function(event){
     if(event.key === "b"){
-        document.body.classList.toggle("claro");
+        document.body.classList.toggle("oscuro");
     }
 })
 

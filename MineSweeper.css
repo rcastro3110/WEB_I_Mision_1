@@ -1,11 +1,11 @@
 :root {
-  --bg: #141414;
-  --panel: #1e1e1e;
-  --border: #333;
-  --accent: #39ff14;
-  --text: #e0e0e0;
-  --danger: #ff3b3b;
-  --revealed: #473d3d;
+  --bg: #f0ead6;
+  --panel: #fffdf5;
+  --border: #c9bfa0;
+  --accent: #b5651d;
+  --text: #4a3f2a;
+  --danger: #c1432f;
+  --revealed: #e3d9bd;
 }
 
 body {
@@ -22,14 +22,14 @@ body {
   min-height: 100vh;
 }
 
-body.claro {
-  --bg: #c5c5c3;
-  --panel: #b69a9a;
-  --border: #030303;
-  --accent: #1a8f1a;
-  --text: #1a1a1a;
+body.oscuro {
+  --bg: #141414;
+  --panel: #1e1e1e;
+  --border: #333;
+  --accent: #39ff14;
+  --text: #e0e0e0;
   --danger: #ff3b3b;
-  --revealed: #e0ded8;
+  --revealed: #473d3d;
 }
 
 header {

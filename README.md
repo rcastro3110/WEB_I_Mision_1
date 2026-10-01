@@ -45,3 +45,10 @@ Escribí a mano: Las subfunciones de revelarCelda (ganarJuego(), perderJuego()).
    celdas) el peor caso son unos cientos de llamadas anidadas, muy por
    debajo del límite de pila típico de un navegador, asi que para este 
    proyecto no hace falta pasar a una versión iterativa a este tamaño.
+
+5. Probé a propósito el peor caso para el flood fill: tablero
+   personalizado de 30x30 con solo 10 minas, para que casi todo el
+   tablero fuera una sola zona vacía. Al hacer clic se revelaron de
+   golpe cientos de celdas sin que se rompiera nada ni se notara
+   lag, así que el límite de pila del punto anterior no es un
+   problema real para los tamaños que maneja el juego.
